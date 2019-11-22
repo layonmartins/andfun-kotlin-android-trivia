@@ -50,17 +50,45 @@ class GameWonFragment : Fragment() {
         Toast.makeText(context,
                 "NumCorrect: ${args.numCorrect}, NumQuestions: ${args.numQuestions}",
                 Toast.LENGTH_LONG).show()
-        // TODO (01) Add setHasOptionsMenu(true)
+        // TODOne (01) Add setHasOptionsMenu(true)
+        setHasOptionsMenu(true)
         // This allows onCreateOptionsMenu to be called
         return binding.root
     }
 
 
-    // TODO (02) Create getShareIntent method
-    // TODO (03) Create shareSuccess method
-    // TODO (04) Override and fill out onCreateOptionsMenu
+    // TODOne (02) Create getShareIntent method
+    private fun getShareIntent() : Intent {
+        val args = arguments?.let { GameWonFragmentArgs.fromBundle(it) }
+        val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.setType("text/plain")
+                    .putExtra(Intent.EXTRA_TEXT, getString(R.string.share_success_text, args?.numCorrect, args?.numQuestions))
+        return shareIntent
+    }
+
+    // TODOne (03) Create shareSuccess method
+    private fun shareSuccess(){
+        startActivity(getShareIntent())
+    }
+
+    // TODOne (04) Override and fill out onCreateOptionsMenu
     // Inflate the winner_menu and set the share menu item to invisible if the activity doesn't
     // resolve
-    // TODO (05) Override onOptionsItemSelected
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.winner_menu, menu)
+        // check if the activity resolves
+        if (null == getShareIntent().resolveActivity(activity!!.packageManager)) {
+            menu?.findItem(R.id.share)?.setVisible(false)
+        }
+    }
+
+    // TODOne (05) Override onOptionsItemSelected
     // Call the shareSuccess method when the item id matches R.id.share
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item!!.itemId) {
+            R.id.share -> shareSuccess()
+        }
+        return super.onOptionsItemSelected(item)
+    }
 }
